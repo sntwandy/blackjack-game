@@ -9,6 +9,7 @@ let deck = [];
 const cardTypes = ['C', 'D', 'H', 'S'];
 const cardTypesSpecials = ['A', 'J', 'Q', 'K'];
 
+// Create a new deck
 const createDeck = () => {
     for (let i = 2; i <= 10; i++) {
         for (let cardType of cardTypes) {
@@ -22,7 +23,7 @@ const createDeck = () => {
         };
     };
 
-    console.log(deck);
+    // console.log(deck);
     deck = _.shuffle(deck);
     console.log(deck);
 
@@ -30,3 +31,20 @@ const createDeck = () => {
 };
 
 createDeck();
+
+
+// Pick a card
+
+const pickCard = () => {
+
+    if (deck.length === 0) {
+        throw 'No cards';
+    }
+
+    const card = deck.pop();
+    console.log(card);
+    console.log(deck);
+    return card;
+};
+
+// pickCard();

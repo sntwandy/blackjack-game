@@ -6,7 +6,9 @@
  */
 
 // HTML refences
+const btnNewGame = document.querySelector('#btnNewGame');
 const btnRequestCard = document.querySelector('#btnRequestCard');
+const btnStop = document.querySelector('#btnStop');
 const pointsContainer = document.querySelectorAll('small');
 const playerCards = document.querySelector('#player-cards');
 const computerCards = document.querySelector('#computer-cards');
@@ -38,7 +40,7 @@ const createDeck = () => {
     return deck;
 };
 
-// createDeck();
+createDeck();
 
 
 // Pick a card
@@ -67,14 +69,25 @@ const cardValue = (card) => {
 };
 
 // computer turn
+const computerTurn = (minPoints) => {
+    do {
+        const card = pickCard();
+        computerPoints += cardValue(card);
+        pointsContainer[1].innerText = computerPoints;
 
+        computerCards.append(createCardDOM(card));
+
+        if (minPoints > 21) {
+            break;
+        };
+
+    } while ( (computerPoints < minPoints) && (minPoints <= 21));
+}
 
 // const value = cardValue(pickCard());
 
 // Events
 btnRequestCard.addEventListener('click', () => {
-
-    createDeck();
 
     const card = pickCard();
     playerPoints += cardValue(card);
@@ -83,6 +96,17 @@ btnRequestCard.addEventListener('click', () => {
     playerCards.append(createCardDOM(card));
 
     playerLoose(playerPoints);
+});
+
+btnStop.addEventListener('click', () => {
+    btnRequestCard.disabled = true;
+    computerTurn(playerPoints);
+    btnStop.disabled = true;
+});
+
+btnNewGame.addEventListener('click', () => {
+    resetGame();
+    createDeck();
 });
 
 // Create card to the DOM
@@ -98,7 +122,27 @@ const createCardDOM = (card) => {
 // Player loose
 
 const playerLoose = (points) => {
-    (points > 21) ? btnRequestCard.disabled = true
-        : (points === 21) ? btnRequestCard.disabled = true
-            : btnRequestCard.disabled = false;
+    if (points > 21) {
+        alert('Iam sorry, you lose!');
+        btnRequestCard.disabled = true;
+        btnStop.disabled = true;
+        computerTurn(points);
+    } else if (points === 21) {
+        alert('Nice, you make 21!!');
+        btnRequestCard.disbled = true;
+        btnStop.disabled = tue;
+        computerTurn(points);
+    }
+};
+
+const resetGame = () => {
+    deck = [];
+    playerCards.innerText = '';
+    computerCards.innerText = '';
+    pointsContainer[0].innerText = '0';
+    pointsContainer[1].innerText = '0';
+    computerPoints = 0;
+    playerPoints = 0;
+    btnRequestCard.disabled = false;
+    btnStop.disabled = false;
 };

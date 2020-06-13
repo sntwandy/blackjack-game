@@ -80,8 +80,19 @@ const computerTurn = (minPoints) => {
         if (minPoints > 21) {
             break;
         };
-
     } while ( (computerPoints < minPoints) && (minPoints <= 21));
+
+    setTimeout( () => {
+        if (computerPoints === minPoints) {
+            alert('Tied game');
+        } else if (minPoints > 21) {
+            alert('Computer Won!');
+        } else if (computerPoints > 21) {
+            alert('Player Won!');
+        } else {
+            alert('Computer Won');
+        }
+    }, 500 );
 }
 
 // const value = cardValue(pickCard());
@@ -101,6 +112,7 @@ btnRequestCard.addEventListener('click', () => {
 btnStop.addEventListener('click', () => {
     btnRequestCard.disabled = true;
     computerTurn(playerPoints);
+    winOrLoose();
     btnStop.disabled = true;
 });
 
@@ -123,7 +135,6 @@ const createCardDOM = (card) => {
 
 const playerLoose = (points) => {
     if (points > 21) {
-        alert('Iam sorry, you lose!');
         btnRequestCard.disabled = true;
         btnStop.disabled = true;
         computerTurn(points);

@@ -5,22 +5,35 @@
  *  2S = Two of Spades
  */
 
-// HTML refences
-const btnNewGame = document.querySelector('#btnNewGame');
-const btnRequestCard = document.querySelector('#btnRequestCard');
-const btnStop = document.querySelector('#btnStop');
-const pointsContainer = document.querySelectorAll('small');
-const playerCards = document.querySelector('#player-cards');
-const computerCards = document.querySelector('#computer-cards');
+
+(() => {
+    'use strict'
+
+    // HTML refences
+const btnNewGame = document.querySelector('#btnNewGame'),
+        btnRequestCard = document.querySelector('#btnRequestCard'),
+        btnStop = document.querySelector('#btnStop'),
+        pointsContainer = document.querySelectorAll('small'),
+        playerCards = document.querySelector('#player-cards'),
+        computerCards = document.querySelector('#computer-cards');
 
 // variables
 let deck = [];
-const cardTypes = ['C', 'D', 'H', 'S'];
-const cardTypesSpecials = ['A', 'J', 'Q', 'K'];
-let playerPoints = 0, computerPoints = 0;
+const cardTypes = ['C', 'D', 'H', 'S'],
+    cardTypesSpecials = ['A', 'J', 'Q', 'K'];
+let playersPoints = [];
+
+// Initializing Game
+const initializingGame = (playerNum = 1) => {
+    for (let i = 0; i < playerNum; i++) {
+        playersPoints.push(0);
+    };
+    return deck = createDeck();
+}
 
 // Create a new deck
 const createDeck = () => {
+    deck = [];
     for (let i = 2; i <= 10; i++) {
         for (let cardType of cardTypes) {
             deck.push(`${i}${cardType}`);
@@ -32,34 +45,13 @@ const createDeck = () => {
             deck.push(`${cardTypeSpecial}${cardType}`);
         };
     };
-
-    // console.log(deck);
-    deck = _.shuffle(deck);
-    // console.log(deck);
-
-    return deck;
+    return deck = _.shuffle(deck);;
 };
-
-createDeck();
-
 
 // Pick a card
+const pickCard = () => (deck.length === 0) ? alert('No cards') : deck.pop();
 
-const pickCard = () => {
-
-    if (deck.length === 0) {
-        throw 'No cards';
-    }
-
-    const card = deck.pop();
-    // console.log(card);
-    // console.log(deck);
-    return card;
-};
-
-// pickCard();
-
-// Card value
+// Get card value
 const cardValue = (card) => {
 
     const value = card.substring(0, card.length - 1);
@@ -67,6 +59,11 @@ const cardValue = (card) => {
             (value === 'A') ? 11 : 10
             : value * 1;
 };
+
+// Accumulate points
+const accumulatePoints = () => {
+
+}
 
 // computer turn
 const computerTurn = (minPoints) => {
@@ -112,7 +109,6 @@ btnRequestCard.addEventListener('click', () => {
 btnStop.addEventListener('click', () => {
     btnRequestCard.disabled = true;
     computerTurn(playerPoints);
-    winOrLoose();
     btnStop.disabled = true;
 });
 
@@ -141,13 +137,13 @@ const playerLoose = (points) => {
     } else if (points === 21) {
         alert('Nice, you make 21!!');
         btnRequestCard.disbled = true;
-        btnStop.disabled = tue;
+        btnStop.disabled = true;
         computerTurn(points);
     }
 };
 
 const resetGame = () => {
-    deck = [];
+    initializingGame();
     playerCards.innerText = '';
     computerCards.innerText = '';
     pointsContainer[0].innerText = '0';
@@ -157,3 +153,5 @@ const resetGame = () => {
     btnRequestCard.disabled = false;
     btnStop.disabled = false;
 };
+
+})();

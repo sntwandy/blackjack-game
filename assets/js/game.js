@@ -7,7 +7,7 @@
 
 
 const gameModule = (() => {
-    'use strict'
+    'use strict';
 
     // HTML refences
 const btnNewGame = document.querySelector('#btnNewGame'),

@@ -6,7 +6,7 @@
  */
 
 
-(() => {
+const gameModule = (() => {
     'use strict'
 
     // HTML refences
@@ -14,8 +14,7 @@ const btnNewGame = document.querySelector('#btnNewGame'),
         btnRequestCard = document.querySelector('#btnRequestCard'),
         btnStop = document.querySelector('#btnStop'),
         pointsContainer = document.querySelectorAll('small'),
-        playerCards = document.querySelector('#player-cards'),
-        computerCards = document.querySelector('#computer-cards');
+        playersCards = document.querySelectorAll('.playersCards');
 
 // variables
 let deck = [];
@@ -24,12 +23,21 @@ const cardTypes = ['C', 'D', 'H', 'S'],
 let playersPoints = [];
 
 // Initializing Game
-const initializingGame = (playerNum = 1) => {
+btnRequestCard.disabled = true;
+btnStop.disabled = true;
+
+const initializingGame = (playerNum = 2) => {
+    playersPoints = [];
     for (let i = 0; i < playerNum; i++) {
         playersPoints.push(0);
     };
-    return deck = createDeck();
-}
+
+    pointsContainer.forEach(element => element.innerText = '0');
+    playersCards.forEach(element => element.innerHTML = '');
+
+    btnRequestCard.disabled = false;
+    btnStop.disabled = false;
+};
 
 // Create a new deck
 const createDeck = () => {
@@ -48,37 +56,9 @@ const createDeck = () => {
     return deck = _.shuffle(deck);;
 };
 
-// Pick a card
-const pickCard = () => (deck.length === 0) ? alert('No cards') : deck.pop();
-
-// Get card value
-const cardValue = (card) => {
-
-    const value = card.substring(0, card.length - 1);
-    return (isNaN(value)) ?
-            (value === 'A') ? 11 : 10
-            : value * 1;
-};
-
-// Accumulate points
-const accumulatePoints = () => {
-
-}
-
-// computer turn
-const computerTurn = (minPoints) => {
-    do {
-        const card = pickCard();
-        computerPoints += cardValue(card);
-        pointsContainer[1].innerText = computerPoints;
-
-        computerCards.append(createCardDOM(card));
-
-        if (minPoints > 21) {
-            break;
-        };
-    } while ( (computerPoints < minPoints) && (minPoints <= 21));
-
+// Determinate win
+const determinateWin = () => {
+    const [minPoints, computerPoints] = playersPoints;
     setTimeout( () => {
         if (computerPoints === minPoints) {
             alert('Tied game');
@@ -90,25 +70,45 @@ const computerTurn = (minPoints) => {
             alert('Computer Won');
         }
     }, 500 );
+};
+
+// Pick a card
+const pickCard = () => (deck.length === 0) ? alert('No cards') : deck.pop();
+
+// Get card value
+const cardValue = (card) => {
+    const value = card.slice(0, card.length - 1);
+    return (isNaN(value)) ?
+            (value === 'A') ? 11 : 10
+            : value * 1;
+};
+
+// Accumulate points
+const accumulatePoints = (turn, card) => {
+    playersPoints[turn] += cardValue(card);
+    pointsContainer[turn].innerText = playersPoints[turn];
+    return playersPoints[turn];
 }
 
-// const value = cardValue(pickCard());
+// computer turn
+const computerTurn = (minPoints) => {
+    let computerPoints = 0;
+    do {
+        const card = pickCard();
+        computerPoints = accumulatePoints(playersPoints.length - 1, card);
+        createCardDOM(card, playersCards.length - 1);
+    } while ( (computerPoints < minPoints) && (minPoints <= 21));
+    determinateWin();
+};
 
 // Events
 btnRequestCard.addEventListener('click', () => {
-
-    const card = pickCard();
-    playerPoints += cardValue(card);
-    pointsContainer[0].innerText = playerPoints;
-
-    playerCards.append(createCardDOM(card));
-
-    playerLoose(playerPoints);
+    btnRequestCardFn();
 });
 
 btnStop.addEventListener('click', () => {
     btnRequestCard.disabled = true;
-    computerTurn(playerPoints);
+    computerTurn(playersPoints[0]);
     btnStop.disabled = true;
 });
 
@@ -118,40 +118,45 @@ btnNewGame.addEventListener('click', () => {
 });
 
 // Create card to the DOM
-
-const createCardDOM = (card) => {
+const createCardDOM = (card, turn) => {
     const cardImg = document.createElement('img');
     cardImg.classList.add('card');
     cardImg.src = `./assets/cartas/${card}.png`;
-
-    return cardImg;
+    playersCards[turn].append(cardImg);
 };
 
-// Player loose
-
-const playerLoose = (points) => {
+// Player action
+const playerAction = (points) => {
     if (points > 21) {
         btnRequestCard.disabled = true;
         btnStop.disabled = true;
         computerTurn(points);
     } else if (points === 21) {
-        alert('Nice, you make 21!!');
-        btnRequestCard.disbled = true;
+        setTimeout( () => {
+            alert('Nice, you make 21!!');
+        }, 500 );
+        btnRequestCard.disabled = true;
         btnStop.disabled = true;
         computerTurn(points);
     }
 };
 
-const resetGame = () => {
-    initializingGame();
-    playerCards.innerText = '';
-    computerCards.innerText = '';
-    pointsContainer[0].innerText = '0';
-    pointsContainer[1].innerText = '0';
-    computerPoints = 0;
-    playerPoints = 0;
-    btnRequestCard.disabled = false;
-    btnStop.disabled = false;
+// Btn request logic
+const btnRequestCardFn = () => {
+    const card = pickCard();
+    const playerPoints = accumulatePoints(0 , card);
+
+    createCardDOM(card, 0);
+
+    playerAction(playerPoints);
 };
 
+// Reset the game
+const resetGame = () => {
+    initializingGame();
+};
+
+return {
+    newGame : initializingGame,
+};
 })();
